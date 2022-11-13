@@ -1,0 +1,8 @@
+id_bert_mmsr.tsv
+id_genres_mmsr.tsv
+id_information_mmsr.tsv
+id_lyrics_tf-idf_mmsr.tsv
+id_lyrics_word2vec_mmsr.tsv
+cosine_retrieved_ids.pkl
+venv
+.idea
