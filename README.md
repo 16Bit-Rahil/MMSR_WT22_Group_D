@@ -13,8 +13,13 @@ evaluation.py
 Evaluates the file created in create_top_k_dict.py and prints the average precision, MMR and nDCG at 10 and 100 songs.
 
 Group members:
-Agnes Hinterplattner, k01635183 \n
-Rahil Mujadidi, k11904249 \n
-Birgit Reiter, k12209548 \n
-Martin Seidl, k11908861 \n
+
+Agnes Hinterplattner, k01635183
+
+Rahil Mujadidi, k11904249
+
+Birgit Reiter, k12209548
+
+Martin Seidl, k11908861
+
 Sebastian Wolff, k12007396
