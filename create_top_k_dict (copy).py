@@ -85,7 +85,7 @@ measures = ['cosine', 'inner_product']
 top_k_dict = {}
 i = 0
 for measure in measures:
-    for song_id in tqdm(id_information.head(1000)['id']):
+    for song_id in tqdm(id_information['id']): #.head(1000)['id']):
         top_k = search_with_id(song_id, measure=measure)
         top_k_dict[song_id] = top_k
         i += 1
