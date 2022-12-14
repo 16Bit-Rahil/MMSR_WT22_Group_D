@@ -1,7 +1,7 @@
 # MMSR_WT22_Group_D
 
 __retrieval.py__ <br />
-Is the main file for getting the top k songs based on one input song. Execute the file in the terminal with $python retrieval.py ,and enter the artist name, song title and number of songs to be retrieved. Output is a list of songs in the format ['artist', 'song_title']. The type of measure to use and which fatures to consider for recommendation can be chosen in the file.
+Is the main file for getting the top k songs based on one input song. Execute the file in the terminal with $python retrieval.py ,and enter the artist name, song title and number of songs to be retrieved. Output is a list of songs in the format ['artist', 'song_title']. The type of measure to use and which features to consider for recommendation can be chosen in the file. Main retrieval file.
 
 __creating_genre_dict.py__ <br />
 Creates a pickled dictionary of the genres in the format {ID: [Genres]} for the whole id_genres_mmsr.tsv file. Should be executed before executing evaluation.py. File is stored under 'genre_dictionary.pkl'
