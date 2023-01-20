@@ -28,6 +28,9 @@ Jupyter notebook for computing the kendall tau correlation and creating the plot
 __precision_recall_plots.ipynb__ <br />
 Jupyter notebook to efficiently compute the precision and recall for different k and creating the precision-recall plot.
 
+__popularity.ipynb__ <br />
+Jupyter notebook to compute the percent delta mean for k10 and k100.
+
 Group members:
 
 Agnes Hinterplattner, k01635183
