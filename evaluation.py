@@ -36,37 +36,45 @@ def reciprocal_rank(song_id: str, k: int, retrieved_dict: dict, genre_dict: dict
     return rr
 
 
-def dcg(song_id: str, k: int, retrieved_dict: dict, genre_dict: dict):
+def dcg(song_id:str, k:int, retrieved_dict:dict, genre_dict:dict):
     top_k_ids = retrieved_dict[song_id][:k]
     query_genre = genre_dict[song_id]
     dcg_k = 0
+    rel_count = 0
     for idx, s_id in enumerate(top_k_ids):
         genres = genre_dict[s_id]
-        # print(genres)
+        #print(genres)
         if any(item in query_genre for item in genres):
             rel = 1
+            rel_count += 1
         else:
             rel = 0
         if idx == 0:
             dcg_k += rel
         else:
-            dcg_k += (rel / np.log2(idx + 1))
-    return dcg_k
+            dcg_k += (rel/np.log2(idx+1))
+    return dcg_k, rel_count
 
-
-def idcg(k):
+def idcg(k, rel_count):
     idcg_k = 0
     for i in range(k):
-        if i == 0:
-            idcg_k += 1
+        if i < rel_count:
+            if i == 0:
+                idcg_k += 1
+            else:
+                idcg_k += 1/np.log2(i+1)
         else:
-            idcg_k += 1 / np.log2(i + 1)
+            idcg_k += 0
     return idcg_k
 
-
-def ndcg(song_id: str, k: int, retrieved_dict: dict, genre_dict: dict):
-    return dcg(song_id, k, retrieved_dict, genre_dict) / idcg(k)
-
+def ndcg(song_id:str, k:int, retrieved_dict:dict, genre_dict:dict):
+    dcg_at_k, rel_c = dcg(song_id, k, retrieved_dict, genre_dict)
+    if rel_c == 0:
+        ndcg_k = 0
+    else:
+        idcg_at_k = idcg(k, rel_c)
+        ndcg_k = dcg_at_k/idcg_at_k
+    return ndcg_k
 
 def evaluation(retrieval_path: str, k: int = 10):
     """
@@ -90,7 +98,7 @@ def evaluation(retrieval_path: str, k: int = 10):
     return lst
 
 
-evaluation_path = input('Path of [measure]_retreived_ids.pkl file to be evaluated: ')
+evaluation_path = input('Path of [measure]_retrieved_ids.pkl file to be evaluated: ')
 
 for k in [10, 100]:
     evals = evaluation(evaluation_path, k)
