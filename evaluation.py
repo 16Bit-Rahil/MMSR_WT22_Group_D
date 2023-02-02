@@ -40,20 +40,18 @@ def dcg(song_id:str, k:int, retrieved_dict:dict, genre_dict:dict):
     top_k_ids = retrieved_dict[song_id][:k]
     query_genre = genre_dict[song_id]
     dcg_k = 0
-    rel_count = 0
     for idx, s_id in enumerate(top_k_ids):
         genres = genre_dict[s_id]
         #print(genres)
         if any(item in query_genre for item in genres):
             rel = 1
-            rel_count += 1
         else:
             rel = 0
         if idx == 0:
             dcg_k += rel
         else:
             dcg_k += (rel/np.log2(idx+1))
-    return dcg_k, rel_count
+    return dcg_k
 
 def idcg(k, rel_count):
     idcg_k = 0
@@ -67,8 +65,9 @@ def idcg(k, rel_count):
             idcg_k += 0
     return idcg_k
 
-def ndcg(song_id:str, k:int, retrieved_dict:dict, genre_dict:dict):
-    dcg_at_k, rel_c = dcg(song_id, k, retrieved_dict, genre_dict)
+def ndcg(song_id:str, k:int, retrieved_dict:dict, genre_dict:dict, pos_count_dict:dict):
+    dcg_at_k = dcg(song_id, k, retrieved_dict, genre_dict)
+    rel_c = pos_count_dict[song_id] - 1
     if rel_c == 0:
         ndcg_k = 0
     else:
@@ -87,13 +86,15 @@ def evaluation(retrieval_path: str, k: int = 10):
         retrieved_dict = pickle.load(f)
     with open('genre_dictionary.pkl', 'rb') as f:
         genre_dict = pickle.load(f)
+    with open('genre_count_dict.pkl', 'rb') as f:
+        pos_count_dict = pickle.load(f)
     prec_list = []
     rr_list = []
     ndcg_list = []
     for song_id in retrieved_dict:
         prec_list.append(precision(song_id, k, retrieved_dict, genre_dict))
         rr_list.append(reciprocal_rank(song_id, k, retrieved_dict, genre_dict))
-        ndcg_list.append(ndcg(song_id, k, retrieved_dict, genre_dict))
+        ndcg_list.append(ndcg(song_id, k, retrieved_dict, genre_dict, pos_count_dict))
     lst = [sum(prec_list) / len(prec_list), sum(rr_list) / len(rr_list), sum(ndcg_list) / len(ndcg_list)]
     return lst
 
