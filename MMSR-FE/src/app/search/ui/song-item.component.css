@@ -1,0 +1,52 @@
+nb-card{
+  max-width:20rem;
+}
+nb-card-header{
+    display: flex;
+    justify-content: center;
+  }
+  img {
+    max-width: 100%;
+    margin: auto;
+  }
+
+  .header {
+    border-bottom: none;
+  }
+
+  .song-title {
+    font-weight: bolder;
+    text-align: center;
+  }
+
+  .song-artist {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  .song-release {
+    font-size: 0.85rem;
+    text-align: center;
+    color: darkgrey;
+  }
+
+  .accuracy {
+    display: flex;
+    justify-self: center;
+  }
+
+  nb-card-footer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  .song-content {
+    min-height: 5rem;
+  }
+
+  .accuracy {
+    justify-content: center;
+    font-size: x-small;
+    font-weight: 700;
+  }

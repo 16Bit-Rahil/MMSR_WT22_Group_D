@@ -1,0 +1,63 @@
+<ng-container *ngIf="detailsData | async as details">
+  <nb-layout>
+    <nb-layout-column>
+      <ng-container *ngIf="similarSongs | async as similarSongs">
+        <h3>Similar Songs</h3>
+        <div class="list-wrapper" *ngFor="let similarSong of similarSongs.content; let i = index">
+          <div class="similar-number">{{i+1 < 10 ? '0'+ (i+1) : i+1}}</div>
+          <div class="cover">
+            <img width="50px" [src]="similarSong.song.imgLink" (error)="setDefaultCover(similarSong.song)">
+          </div>
+          <div class="song-details">
+            <div class="song-name">{{similarSong.song.songName}}</div>
+            <div class="artists">{{similarSong.song.artist}}</div>
+          </div>
+          <div class="duration">{{similarSong.trackInfo?.duration | date:'mm:ss'}}</div>
+          <div class="clicks">{{similarSong.trackInfo?.playcount | number}}</div>
+          <button class="details-button" (click)="navigate(similarSong.song.id)" nbButton>Details</button>
+        </div>
+        <button *ngIf="!similarSongs.last"
+                (click)="loadMore()"
+                nbButton outline status="primary"
+        >More...</button>
+      </ng-container>
+    </nb-layout-column>
+
+    <nb-layout-column left>
+      <h1 class="title-song">{{details.song.songName}}</h1>
+      <div class="artists flex">
+        <nb-icon icon="person"></nb-icon>
+        <p class="artists-title">{{details.song.artist}}</p>
+      </div>
+      <ng-container *ngIf="details.song.youtubeLink">
+        <app-yt-player videoID="{{getYoutubeId(details.song.youtubeLink)}}"></app-yt-player>
+      </ng-container>
+      <div *ngIf="!details.song.youtubeLink"> NO YOUTUBE VIDEO</div>
+
+      <div>
+
+<!--        <img [src]="details.song.imgLink" (error)="setDefaultCover(details.song)">-->
+        <div class="song-info">
+          <div>
+            <h5 class="title-details">{{details.trackInfo?.duration | date:'mm:ss'}}</h5>
+            <h5 *ngIf="!details.trackInfo?.duration" class="title-details">unknown</h5>
+            <p class="subtitle-details">minutes</p>
+          </div>
+          <div>
+            <h5 class="title-details">{{details.trackInfo?.playcount | number}}</h5>
+            <h5 *ngIf="!details.trackInfo?.playcount" class="title-details">unknown</h5>
+            <p class="subtitle-details">playcount</p>
+          </div>
+          <div>
+            <h5 class="title-details">{{details.trackInfo?.wiki?.published | date}}</h5>
+            <h5 *ngIf="!details.trackInfo?.wiki?.published" class="title-details">unknown</h5>
+            <p class="subtitle-details">released</p>
+          </div>
+        </div>
+        <p>{{getSummary(details.trackInfo?.wiki?.summary)}}</p>
+        <p *ngIf="!details.trackInfo?.wiki?.summary">No Description</p>
+      </div>
+    </nb-layout-column>
+  </nb-layout>
+</ng-container>
+

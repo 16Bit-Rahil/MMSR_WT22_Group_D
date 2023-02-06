@@ -1,0 +1,22 @@
+<ng-container *ngIf="searchResult$ | async as resultPage">
+    <ng-container *ngIf="resultPage.totalElements !== 0;else notFound">
+        <h1>Search Results:</h1>
+        <div class="search-result" >
+          <ng-container *ngFor="let song of resultPage.content; let i = index">
+            <song-item
+            [song]="song"></song-item>
+          </ng-container>
+        </div>
+        <div class="load-more-container">
+          <button *ngIf="!resultPage.last"
+          (click)="loadMore()"
+          nbButton outline status="primary"
+          >More...</button>
+        </div>
+      </ng-container>
+    <ng-template #notFound>
+      <h1>No Results</h1>
+    </ng-template>
+</ng-container>
+
+
