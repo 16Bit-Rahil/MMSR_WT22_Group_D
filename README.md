@@ -31,7 +31,7 @@ __precision_recall_plots.ipynb__ <br />
 Jupyter notebook to efficiently compute the precision and recall for different k and creating the precision-recall plot.
 
 __popularity.ipynb__ <br />
-Jupyter notebook to compute the percent delta mean for k10 and k100.
+Jupyter notebook to compute the percent delta mean for k10 and k100. The results for percent delta mean(q) can be found here: [percent delta mean(q) results](https://drive.google.com/drive/folders/1MV3XvZdjyZnpBjO0NKYCj5Ejc-y86WJ6?usp=sharing)
 
 __hubness.ipynb__ <br />
 Jupyter note book to compute the hubness metric for k=10 and k=100.
