@@ -1,7 +1,9 @@
 # MMSR_WT22_Group_D
 
+[User Interface](http://frontend-client.s3-website.eu-central-1.amazonaws.com/home)
+
 __retrieval.py__ <br />
-Is the main file for getting the top k songs based on one input song. Execute the file in the terminal with $python retrieval.py ,and enter the artist name, song title and number of songs to be retrieved. Output is a list of songs in the format ['artist', 'song_title']. The type of measure to use and which features to consider for recommendation can be chosen in the file. Main retrieval file.
+Is the main file for getting the top k songs based on one input song. Execute the file in the terminal with $python retrieval.py ,and enter the artist name, song title and number of songs to be retrieved. Output is a list of songs in the format ['artist', 'song_title']. The type of measure to use and which features to consider for recommendation can be chosen in the file. features = 'best' computes the ranking according to the method described in the report. Main retrieval file. [Files for best method](https://drive.google.com/file/d/195FYiUFbQTJ3oBdeeQ-jXqJ44gwI5HxG/view?usp=sharing)
 
 __creating_genre_dict.py__ <br />
 Creates a pickled dictionary of the genres in the format {ID: [Genres]} for the whole id_genres_mmsr.tsv file. Should be executed before executing evaluation.py. File is stored under 'genre_dictionary.pkl'
@@ -31,9 +33,13 @@ Jupyter notebook to efficiently compute the precision and recall for different k
 __popularity.ipynb__ <br />
 Jupyter notebook to compute the percent delta mean for k10 and k100.
 
-Group members:
+__hubness.ipynb__ <br />
+Jupyter note book to compute the hubness metric for k=10 and k=100.
 
-Agnes Hinterplattner, k01635183
+__late-fusion.ipynb__ <br />
+Jupyter notebook to compute the simple or weighted borda count on precomputed rankings.
+
+Group members:
 
 Rahil Mujadidi, k11904249
 
@@ -42,3 +48,5 @@ Birgit Reiter, k12209548
 Martin Seidl, k11908861
 
 Sebastian Wolff, k12007396
+
+A̶g̶n̶e̶s̶ ̶H̶i̶n̶t̶e̶r̶p̶l̶a̶t̶t̶n̶e̶r̶,̶ ̶k̶0̶1̶6̶3̶5̶1̶8̶3̶
