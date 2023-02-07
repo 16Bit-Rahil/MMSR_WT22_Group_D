@@ -11,7 +11,7 @@ artist, song, k = str(input('Artist name: ')), str(input('Song title: ')), int(i
 # as it computes the top k songs in a more reasonable time than the jaccard score and achieves better values than the
 # inner product
 measure = 'cosine'
-features = 'id_vgg19'
+features = 'best'
 # measure = str(input(measure: ))
 # features = str(input(features: ))
 id_information = pd.read_csv(path + 'id_information_mmsr.tsv', sep='\t')
@@ -33,6 +33,9 @@ def cosine_similarities(x, Y):
 
     return DotP / ((nx * nY) + 1e-10)
 
+def normal(x):
+    return (x-0.494)/(0.606 - 0.494)  # values are hardcoded as it is only used for one fixed method
+
 
 def search(artist: str, song_query: str, k: int = 10, measure='cosine', features='basic'):
     """
@@ -42,7 +45,7 @@ def search(artist: str, song_query: str, k: int = 10, measure='cosine', features
     :param k: Number of Top elements, defaults to 10
     :param measure: Similarity measure, ['cosine', 'jaccard', 'inner_product'], default = cosine
     :param features: Which feature to use for calculation. Can either use the basic lyric features implementation or
-                    choose one of the new features, ['basic', 'feature_name']
+                    choose one of the new features, ['basic', 'feature_name', 'best']
     :return: list of lists with artist and song of top k songs
     """
 
@@ -137,6 +140,90 @@ def search(artist: str, song_query: str, k: int = 10, measure='cosine', features
             # we store the retrieved songs in a dictionary in a pickle file
             with open(measure + '_retrieved_ids.pkl', 'wb') as f:
                 pickle.dump(retrieved_dict, f)
+    elif features == 'best':  # computes ranking with best feature combination and late fusion, for this we first have to run it for 100
+        # otherwise we get wrong results for 10
+        # first we check if there is a dictionary for the measure available
+        if os.path.exists(path +f'best_retrieved_ids.pkl'):
+            with open(path +f'best_retrieved_ids.pkl', 'rb') as f:
+                retrieved_dict = pickle.load(f)
+        else:
+            retrieved_dict = {}
+        song_id = id_information.loc[(id_information['artist'] == artist) & (id_information['song'] == song_query)]
+        query_id = song_id.iloc[0]['id']
+        # check if the id is already in the dictionary
+        if query_id in retrieved_dict and len(retrieved_dict[query_id]) >= k:
+            top_k_ids = retrieved_dict[query_id]
+            top_k_ids = top_k_ids[:k]
+        else:
+            file_list = []
+            # for each of the three chosen features we compute the similarity and store it
+            for features in ['id_resnet', 'id_bert', 'id_mfcc_bow']:
+                if os.path.exists(path + f'{features}' + '_cosine_retrieved_ids.pkl'):
+                    with open(path + f'{features}' + '_cosine_retrieved_ids.pkl', 'rb') as f:
+                        retrieved_dict_feat = pickle.load(f)
+                else:
+                    retrieved_dict_feat = {}
+                id_feature = pd.read_csv(path + f'{features}_pca.tsv', sep='\t')
+                if query_id in retrieved_dict_feat and len(retrieved_dict_feat[query_id]) >= k:
+                    top_k_ids = retrieved_dict_feat[query_id]
+                    top_k_ids = top_k_ids[:k]
+                else:
+                    feat_query = id_feature.loc[id_feature['id'] == query_id]
+                    feat_query = np.array(feat_query.drop(columns=['id']))
+                    subset_ids = id_feature[['id']].copy()
+
+                    feat_no_id = np.array(id_feature.drop(columns=['id']))
+
+                    # next we apply our similarity measure
+                    cosine = cosine_similarities(feat_query, feat_no_id)
+                    subset_ids.insert(1, 'cosine', cosine)
+
+
+                    # then we sort our values and get the top k
+                    subset_ids = subset_ids.sort_values(measure, ascending=False)
+                    sorted_measure = subset_ids.iloc[1:, :]
+                    top_k = sorted_measure.head(k)
+                    top_k_ids = np.array(top_k['id'])
+                    retrieved_dict_feat[query_id] = list(top_k_ids)
+                    with open(path +f'{features}' + '_cosine_retrieved_ids.pkl', 'wb') as f:
+                        pickle.dump(retrieved_dict_feat, f)
+                    file_list.append(f'{features}' + '_cosine_retrieved_ids.pkl')
+            print(file_list)
+            dict_dict = {}
+            # we create a dictionary of the similarities
+            for file in file_list:
+                with open(path + file, 'rb') as f:
+                    retrieved_dict = pickle.load(f)
+                    dict_dict[file] = retrieved_dict
+            weights = [0.606, 0.574, 0.603] # hardcoded weights for the fixed files, based on ndcg@10 value
+            nor_weight = []
+            #normalize the weights
+            for x in weights:
+                nor_weight.append(normal(x))
+            borda_dict = {}
+            # create a dictionary of the weighted borda count votes
+            for song_idx in [query_id]:
+                vote_dict = {}
+                for idc, method in enumerate(file_list):  # [1:]:
+                    for vote, idx in enumerate(dict_dict[method][song_idx]):
+                        if idx in vote_dict:
+                            vote_dict[idx] += nor_weight[idc] * (100 - vote)
+                        else:
+                            vote_dict[idx] = nor_weight[idc] * (100 - vote)
+                borda_dict[song_idx] = vote_dict
+            # create new rankings according to borda count
+            for song_idx in [query_id]:
+                borda_df = pd.DataFrame.from_dict(borda_dict[song_idx], orient='index', columns=['counts'])
+                borda_df = borda_df.sort_values('counts', ascending=False)
+                new_list = list(borda_df.index.values)[:100]
+                retrieved_dict[song_idx] = new_list
+            # store new ranking in pkl file
+            with open(path + 'best_retrieved_ids.pkl', 'wb') as f:
+                pickle.dump(retrieved_dict, f)
+            # get top k ids
+            top_k_ids = retrieved_dict[query_id]
+            top_k_ids = top_k_ids[:k]
+
     else:
         # first we check if there is a dictionary for the measure available
         if os.path.exists(f'{features}' + '_' + measure + '_retrieved_ids.pkl'):
